@@ -26,11 +26,12 @@ FYI:
 ╠══ DATA     1520     initialized variables
 ╠══ RODATA   928      constants       
 ╚══ BSS      25720    zeroed variables
+
 . Instruction RAM (IRAM_ATTR, ICACHE_RAM_ATTR), used 60647 / 65536 bytes (92%)
 ║   SEGMENT  BYTES    DESCRIPTION
 ╠══ ICACHE   32768    reserved space for flash instruction cache
 ╚══ IRAM     27879    code in IRAM    
+
 . Code in flash (default, ICACHE_FLASH_ATTR), used 234404 / 1048576 bytes (22%)
 ║   SEGMENT  BYTES    DESCRIPTION
-╚══ IROM     234404   code in flash   
-Failed uploading: no upload port provided
+╚══ IROM     234404   code in flash
