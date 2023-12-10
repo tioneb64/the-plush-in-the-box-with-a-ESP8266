@@ -17,3 +17,20 @@ Finally, inside the box, fixed on the inner front face is a double diode that li
 In the box, there are 3 rechargeable 1.5-volt batteries, connected in series, giving me 4.5 volts. Between the batteries and the ESP8266, which must be powered with 3.3 volts, I have installed the Semoic ESP8266 Serial Wireless Module Adapter ESP-01 Wi-Fi 3.3V 5V. This voltage regulator can take up to 5 volts as input and deliver 3.3 volts to the ESP8266. You can also use a phone charger that provides 5 volts instead of batteries if you prefer.
 
 Have fun!!
+
+
+FYI:
+
+. Variables and constants in RAM (global, static), used 28168 / 80192 bytes (35%)
+║   SEGMENT  BYTES    DESCRIPTION
+╠══ DATA     1520     initialized variables
+╠══ RODATA   928      constants       
+╚══ BSS      25720    zeroed variables
+. Instruction RAM (IRAM_ATTR, ICACHE_RAM_ATTR), used 60647 / 65536 bytes (92%)
+║   SEGMENT  BYTES    DESCRIPTION
+╠══ ICACHE   32768    reserved space for flash instruction cache
+╚══ IRAM     27879    code in IRAM    
+. Code in flash (default, ICACHE_FLASH_ATTR), used 234404 / 1048576 bytes (22%)
+║   SEGMENT  BYTES    DESCRIPTION
+╚══ IROM     234404   code in flash   
+Failed uploading: no upload port provided
