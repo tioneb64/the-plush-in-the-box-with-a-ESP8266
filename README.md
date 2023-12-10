@@ -14,6 +14,12 @@ On the rod at the bottom of the box, which rises when the servo motor on the rig
 
 Finally, inside the box, fixed on the inner front face is a double diode that lights up when the box opens.
 
-In the box, there are 3 rechargeable 1.5-volt batteries, connected in series, giving me 4.5 volts. Between the batteries and the ESP8266, which must be powered with 3.3 volts, I have installed the Semoic ESP8266 Serial Wireless Module Adapter ESP-01 Wi-Fi 3.3V 5V. This voltage regulator can take up to 5 volts as input and deliver 3.3 volts to the ESP8266. You can also use a phone charger that provides 5 volts instead of batteries if you prefer.
+
+## Power Supply:
+For the power supply, I wanted to avoid dependence on an external source such as a transformer. Therefore, in the box, I used 3 rechargeable AA batteries of 1.5 V each, connected in series, providing me with a voltage of 4.5 V.
+
+I connected the adapter of the Semoic ESP8266 Serial ESP-01 Wi-Fi 3.3V 5V module. This voltage regulator then supplies a stable 3.3 V to the ESP8266. The servo motors are directly connected to their +5 V pin, and the GND is linked to the battery terminals. Finally, pins 12, 13, and 14 are connected to the servo motors, serving as outputs for the lid, arm, and head, respectively. They are connected to the "signal" pin of the servo motors.
+
+Pin 11 is linked to the switch as input, and pin 15 is connected to the diodes. The diodes are powered by the 3.3 V output of the ESP8266 and connected to the GND of the ESP8266.
 
 Have fun!!
