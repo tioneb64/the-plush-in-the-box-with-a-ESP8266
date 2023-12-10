@@ -1,22 +1,22 @@
 #include <Servo.h>
-const int switchPin    = 11;  // Pin for the switch
-const int servoLidPin  = 12;  // Pin for the lid servo motor
-const int servoArmPin  = 13;  // Pin for the arm servo motor
-const int servoHeadPin = 14;  // Pin for the head servo motor
-const int diodePin     = 15;  // Pin for the LED
+const int switchPin    = 11;  // Broche pour l'interrupteur
+const int servoLidPin  = 12;  // Broche pour le servo moteur du couvercle
+const int servoArmPin  = 13;  // Broche pour le servo moteur du bras
+const int servoHeadPin = 14;  // Broche pour le servo moteur de la tête
+const int diodePin     = 15;  // Broche pour la LED
 
 Servo servoLid;
 Servo servoHarm;
 Servo servoHead;
 
-int openingLidAngle        = 0;    // Minimum lid opening position to extend the arm
-int angleMaximumAmplitude  = 90;   // Maximum amplitude of the arm servo motor (servoHarm)
-int maxOpeningMid          = 51;   // Maximum opening angle of the lid.
-int minOpeningLid          = 15;   // Minimum opening angle of the lid.
-int closureLid             =  0;   // Angle at which the lid is considered closed
-int leftHeadAngle          = 40;   // Maximum left angle to turn the head
-int centerHeadAngle        = 90;   // Centered head looking straight
-int rightHeadAngle         = 140;  // Maximum right angle to turn the head
+int openingLidAngle        = 0;    // Position minimale d'ouverture du couvercle pour étendre le bras
+int angleMaximumAmplitude  = 90;   // Amplitude maximale du servo moteur du bras (servoHarm)
+int maxOpeningMid          = 51;   // Angle d'ouverture maximal du couvercle.
+int minOpeningLid          = 15;   // Angle d'ouverture minimal du couvercle.
+int closureLid             =  0;   // Angle auquel le couvercle est considéré comme fermé
+int leftHeadAngle          = 40;   // Angle maximal à gauche pour tourner la tête
+int centerHeadAngle        = 90;   // Angle centré en regardant droit
+int rightHeadAngle         = 140;  // Angle maximal à droite pour tourner la tête
 
 void setup() {
   pinMode(switchPin, INPUT);
@@ -25,14 +25,14 @@ void setup() {
   servoHarm.attach(servoArmPin);
   servoHead.attach(servoHeadPin);
 
-  // Initialize other configurations if needed
+  // Initialiser d'autres configurations si nécessaire
 }
 
 void loop() {
 
-    // Check the state of the switch
+    // Vérifier l'état de l'interrupteur
     if (digitalRead(switchPin) == HIGH) {
-        digitalWrite(diodePin, HIGH);       // Turn on the LED
+        digitalWrite(diodePin, HIGH);       // Allumer la LED
         randomBehavior();
     }
 }
@@ -43,16 +43,16 @@ int moveServo(Servo& servo, int currentPosition, int finalPosition, int speed) {
     int elapsedAnimation = 0;
 
     if (finalPosition < currentPosition)
-        speed = speed * -1; // Make speed negative if the current position is greater than the final position
+        speed = speed * -1; // Rendre la vitesse négative si la position actuelle est supérieure à la position finale
 
     while (servo.read() != finalPosition) {
 
         newPosition = servo.read() + speed;
 
-        // Limit overflows
+        // Limiter les débordements
         newPosition = constrain(currentPosition + speed, finalPosition, currentPosition);
         servo.write(newPosition);
-        delay(10); // Wait for the servo motor to finish moving
+        delay(10); // Attendre que le servo moteur ait fini de bouger
         elapsedAnimation += 10;
     }
 
@@ -60,64 +60,64 @@ int moveServo(Servo& servo, int currentPosition, int finalPosition, int speed) {
 }
 
 void moveLid() {
-    // Code to lift the lid with the servo motor
-    if (servoLid.read() > closureLid) // Lid already open, so close it
-        moveServo(servoLid, servoLid.read(), closureLid, random(5, 50)); // Lift the lid to the specified angle
+    // Code pour lever le couvercle avec le servo moteur
+    if (servoLid.read() > closureLid) // Couvercle déjà ouvert, donc le fermer
+        moveServo(servoLid, servoLid.read(), closureLid, random(5, 50)); // Lever le couvercle à l'angle spécifié
     else
-        moveServo(servoLid, servoLid.read(), random(minOpeningLid, maxOpeningMid), random(5, 50)); // Lift the lid to the specified angle
+        moveServo(servoLid, servoLid.read(), random(minOpeningLid, maxOpeningMid), random(5, 50)); // Lever le couvercle à l'angle spécifié
 }
 
 void turnDownSwitch() {
-    // Code to lower the switch with the arm only if the lid is lifted
+    // Code pour baisser l'interrupteur avec le bras uniquement si le couvercle est levé
 
-    // If the lid is not open enough to clear the arm, open it enough.
+    // Si le couvercle n'est pas assez ouvert pour dégager le bras, l'ouvrir davantage.
     int lidPosition = servoLid.read();
     if (lidPosition < openingLidAngle) {
         servoLid.write(openingLidAngle);
-        delay(20);                          // Wait for the servo motor to finish moving
+        delay(20);                          // Attendre que le servo moteur ait fini de bouger
     }
     
-    // Vary the speed of arm movement by adding a delay
+    // Variabilité de la vitesse du mouvement du bras en ajoutant un délai
     int movementSpeed = random(0, angleMaximumAmplitude);
     moveServo(servoHarm, servoHarm.read(), angleMaximumAmplitude, movementSpeed);
-    digitalWrite(diodePin, LOW); // Turn off the LED
+    digitalWrite(diodePin, LOW); // Éteindre la LED
 
-    // Bring the arm back to angle 0 with a random speed
+    // Ramener le bras à l'angle 0 avec une vitesse aléatoire
     movementSpeed = random(0, servoHarm.read());
     moveServo(servoHarm, servoHarm.read(), minOpeningLid, movementSpeed);
 
-    // If the lid was moved to clear the arm, put it back as at the beginning of the function.
+    // Si le couvercle a été déplacé pour dégager le bras, le remettre comme au début de la fonction.
     if (lidPosition < openingLidAngle) {
         servoLid.write(lidPosition);
-        delay(20);                          // Wait for the servo motor to finish moving
+        delay(20);                          // Attendre que le servo moteur ait fini de bouger
     }
 }
 
 void headSpin() {
-    // Code to randomly turn the head
+    // Code pour tourner aléatoirement la tête
 
-    int animationTime = random(0, 3001); // Random animation time between 0 and 3000 ms
-    int headAngle   = 0;                 // Final head position
-    int movement   = 0;                  // Determines whether the head should move left, right, or stay still
-    int movementSpeed   = 0;             // Head movement speed
-  //  int currentPosition = 0;           // Current head position
+    int animationTime = random(0, 3001); // Animation aléatoire entre 0 et 3000 ms
+    int headAngle   = 0;                 // Position finale de la tête
+    int movement   = 0;                  // Détermine si la tête doit bouger à gauche, à droite, ou rester immobile
+    int movementSpeed   = 0;             // Vitesse de mouvement de la tête
+  //  int currentPosition = 0;           // Position courante de la tête
 
     while (animationTime > 0) {
 
-        // Determine if the head should move left, right, or stay still
-        movement = random(-1, 2);        // -1 for left, 0 for still, 1 for right
-        movementSpeed = random(5, 50);   // Add a movement speed of 5° to 50° every 20ms
+        // Déterminer si la tête doit bouger à gauche, à droite, ou rester immobile
+        movement = random(-1, 2);        // -1 pour la gauche, 0 pour immobile, 1 pour la droite
+        movementSpeed = random(5, 50);   // Ajouter une vitesse de mouvement de 5° à 50° toutes les 20 ms
 
-        if (movement < 0) {                                       // If the head should move left
-            headAngle = random(leftHeadAngle, servoHead.read());  // Set the final angle to the left
-        } else if (movement > 0) {                                // If the head should move right
-            headAngle = random(servoHead.read(), rightHeadAngle); // Set the final angle to the right
+        if (movement < 0) {                                       // Si la tête doit bouger à gauche
+            headAngle = random(leftHeadAngle, servoHead.read());  // Définir l'angle final à gauche
+        } else if (movement > 0) {                                // Si la tête doit bouger à droite
+            headAngle = random(servoHead.read(), rightHeadAngle); // Définir l'angle final à droite
         }
 
-        // Limit the angle between max left and max right
+        // Limiter l'angle entre l'extrême gauche et l'extrême droite
         headAngle = constrain(headAngle, leftHeadAngle, rightHeadAngle);
 
-        if (movement != 0) {               // If the head is not still
+        if (movement != 0) {               // Si la tête n'est pas immobile
             animationTime -= moveServo(servoHead, servoHead.read(), headAngle, movementSpeed);
         } else {
             delay(20);
@@ -125,40 +125,40 @@ void headSpin() {
         }
     }
 
-    servoHead.write(centerHeadAngle);     // Return the head to the initial position (90 degrees)
-    delay(20);                            // Wait for the servo motor to finish moving  
+    servoHead.write(centerHeadAngle);     // Ramener la tête à la position initiale (90 degrés)
+    delay(20);                            // Attendre que le servo moteur ait fini de bouger  
 }
 
 void randomBehavior(){
 
-    int numberOfOpenings = random(1, 6);  // Between 1 and 5 openings
-    int armActivation = 0;                // 0=arm not yet activated, 1=arm already activated
+    int numberOfOpenings = random(1, 6);  // Entre 1 et 5 ouvertures
+    int armActivation = 0;                // 0=bras pas encore activé, 1=bras déjà activé
 
     for (int i = 0; i < numberOfOpenings; ++i) {
 
-        // If the lid needs to be lifted more than once, decide at which opening to activate the arm
+        // Si le couvercle doit être levé plus d'une fois, décider à quelle ouverture activer le bras
         if (numberOfOpenings > 1)
             armActivation = random(1, numberOfOpenings);
         else
-            armActivation = 1;            // If not, activate the arm the first time
+            armActivation = 1;            // Sinon, activer le bras la première fois
 
-        moveLid();                        // Lift the lid
+        moveLid();                        // Lever le couvercle
 
-        // Spin the head and determine the opening time
+        // Tourner la tête et déterminer la durée d'ouverture
         headSpin();
 
-        // If it's the opening where the arm should be activated
+        // Si c'est l'ouverture où le bras doit être activé
         if (i == armActivation) {
             turnDownSwitch();
         }
 
-        // Spin the head and determine the opening time
+        // Tourner la tête et déterminer la durée d'ouverture
         headSpin();
 
-        // Close the lid
+        // Fermer le couvercle
         moveLid();
 
-        // Delay before the next opening
+        // Délai avant la prochaine ouverture
         delay(random(1000, 5000));
     }
 }
