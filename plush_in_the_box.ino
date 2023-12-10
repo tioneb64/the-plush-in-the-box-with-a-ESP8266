@@ -134,13 +134,13 @@ void randomBehavior(){
     int numberOfOpenings = random(1, 6);  // Between 1 and 5 openings
     int armActivation = 0;                // 0=arm not yet activated, 1=arm already activated
 
+    // If the lid needs to be lifted more than once, decide at which opening to activate the arm
+    if (numberOfOpenings > 1)
+        armActivation = random(1, numberOfOpenings);
+    else
+        armActivation = 1;            // If not, activate the arm the first time
+  
     for (int i = 0; i < numberOfOpenings; ++i) {
-
-        // If the lid needs to be lifted more than once, decide at which opening to activate the arm
-        if (numberOfOpenings > 1)
-            armActivation = random(1, numberOfOpenings);
-        else
-            armActivation = 1;            // If not, activate the arm the first time
 
         moveLid();                        // Lift the lid
 
