@@ -134,13 +134,13 @@ void randomBehavior(){
     int numberOfOpenings = random(1, 6);  // Entre 1 et 5 ouvertures
     int armActivation = 0;                // 0=bras pas encore activé, 1=bras déjà activé
 
+    // Si le couvercle doit être levé plus d'une fois, décider à quelle ouverture activer le bras
+    if (numberOfOpenings > 1)
+        armActivation = random(1, numberOfOpenings);
+    else
+        armActivation = 1;            // Sinon, activer le bras la première fois
+  
     for (int i = 0; i < numberOfOpenings; ++i) {
-
-        // Si le couvercle doit être levé plus d'une fois, décider à quelle ouverture activer le bras
-        if (numberOfOpenings > 1)
-            armActivation = random(1, numberOfOpenings);
-        else
-            armActivation = 1;            // Sinon, activer le bras la première fois
 
         moveLid();                        // Lever le couvercle
 
