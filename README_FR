@@ -33,6 +33,6 @@ Enfin, les broches 12, 13 et 14 sont connectées aux servomoteurs, servant de so
 Elles sont connectées à la broche "signal" des servomoteurs.
 
 La broche 11 est liée à l'interrupteur en entrée, et la broche 15 est connectée aux diodes. Les diodes sont alimentées par la sortie 3,3 V de l'ESP8266
-et sont connectées à la masse (GND) de l'ESP8266.
+et sont connectées à la masse (GND) de l'ESP8266. La GND de l'intérupteur est aussi connectée au GND de l'ESP8266.
 
 Amusez-vous bien !!
