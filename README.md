@@ -5,6 +5,8 @@ I created this little program for a game that entertains children a lot and buil
 ## Game explanation:
 The game is a cubic box in which there is a small character. On the front of the box, halfway up on the left, there is a toggle switch. The switch is always oriented downwards. When children lift the switch, the little creature inside the box lifts the lid with its head and extends its arm to the left to bring down the switch. To give the impression of a living being, the program reacts randomly to lift the head, move the arm, or turn the head. The box can open only once or several times before the arm comes out and lowers the switch again. The plushie can, for example, open the lid, turn the head in both directions several times, then close the box before reopening it and quickly bringing down the switch.
 
+Here is a visual example of the result : https://www.youtube.com/watch?v=wlslwdB9Z4g
+
 ## Assembly explanation:
 
 In the box, there is only the head and arm of the plushie. The arm is in the shape of a half-circle. The arm is mounted on a servo motor that rotates it to lower the switch when coming out of the box. The servo motor of the arm is glued to the left inner face of the box and rotates on a vertical axis.
