@@ -10,6 +10,8 @@ levant la tête, en bougeant le bras, ou en tournant la tête. La boîte peut s'
 l'interrupteur. La peluche peut, par exemple, ouvrir le couvercle, tourner la tête dans les deux sens plusieurs fois, puis fermer la boîte avant de la rouvrir 
 et d'abaisser rapidement l'interrupteur.
 
+Voici un exemple visuel du résultat : https://www.youtube.com/watch?v=wlslwdB9Z4g
+
 ## Explication du montage :
 Dans la boîte, il n'y a que la tête et le bras de la peluche. Le bras a la forme d'un demi-cercle. Le bras est monté sur un servomoteur qui le fait tourner pour 
 abaisser l'interrupteur en sortant de la boîte. Le servomoteur du bras est collé à la face interne gauche de la boîte et tourne sur un axe vertical.
