@@ -1,43 +1,47 @@
 #include <Servo.h>
-const int switchPin    = 11;  // Pin for the switch
-const int servoLidPin  = 12;  // Pin for the lid servo motor
-const int servoArmPin  = 13;  // Pin for the arm servo motor
-const int servoHeadPin = 14;  // Pin for the head servo motor
-const int diodePin     = 15;  // Pin for the LED
+// Define pin constants
+const int switchPin    = 12;  // Pin for the switch
+const int servoLidPin  = 13;  // Pin for the lid servo motor
+const int servoArmPin  = 14;  // Pin for the arm servo motor
+const int servoHeadPin = 15;  // Pin for the head servo motor
+const int diodePin     = 16;  // Pin for the LED
 
-Servo servoLid;
-Servo servoHarm;
-Servo servoHead;
 
-int openingLidAngle        = 0;    // Minimum lid opening position to extend the arm
-int angleMaximumAmplitude  = 90;   // Maximum amplitude of the arm servo motor (servoHarm)
-int maxOpeningMid          = 51;   // Maximum opening angle of the lid.
-int minOpeningLid          = 15;   // Minimum opening angle of the lid.
-int closureLid             =  0;   // Angle at which the lid is considered closed
-int leftHeadAngle          = 40;   // Maximum left angle to turn the head
-int centerHeadAngle        = 90;   // Centered head looking straight
-int rightHeadAngle         = 140;  // Maximum right angle to turn the head
+Servo servoLid;             // Servo for the Lid
+Servo servoArm;             // Servo for the Arm
+Servo servoHead;            // Servo for the Head
+
+// Define angle constants
+const int angleMinimumAmplitude  =   0;   // Minimum amplitude of the arm servo motor 
+const int angleMaximumAmplitude  = 120;   // Maximum amplitude of the arm servo motor
+const int openingLidAngle        =   0;   // Minimum lid opening position to extend the arm
+const int maxOpeningMid          =  51;   // Maximum opening angle of the lid.
+const int minOpeningLid          =  15;   // Minimum opening angle of the lid.
+const int closureLid             =   0;   // Angle at which the lid is considered closed
+const int leftHeadAngle          =  40;   // Maximum left angle to turn the head
+const int centerHeadAngle        =  90;   // Centered head looking straight
+const int rightHeadAngle         = 140;   // Maximum right angle to turn the head
+
+bool isSwoff                     = false; // Indicates whether the arm has lowered the switch or not
 
 void setup() {
   pinMode(switchPin, INPUT);
   pinMode(diodePin, OUTPUT);
   servoLid.attach(servoLidPin);
-  servoHarm.attach(servoArmPin);
+  servoArm.attach(servoArmPin);
   servoHead.attach(servoHeadPin);
-
-  // Initialize other configurations if needed
 }
 
 void loop() {
-
     // Check the state of the switch
     if (digitalRead(switchPin) == HIGH) {
         digitalWrite(diodePin, HIGH);       // Turn on the LED
+        isSwoff = false;
         randomBehavior();
     }
 }
 
-int moveServo(Servo& servo, int currentPosition, int finalPosition, int speed) {
+void moveServo(Servo& servo, int currentPosition, int finalPosition, int speed) {
     
     int newPosition = 0;
     int elapsedAnimation = 0;
@@ -55,8 +59,6 @@ int moveServo(Servo& servo, int currentPosition, int finalPosition, int speed) {
         delay(10); // Wait for the servo motor to finish moving
         elapsedAnimation += 10;
     }
-
-    return elapsedAnimation;
 }
 
 void moveLid() {
@@ -67,36 +69,9 @@ void moveLid() {
         moveServo(servoLid, servoLid.read(), random(minOpeningLid, maxOpeningMid), random(5, 50)); // Lift the lid to the specified angle
 }
 
-void turnDownSwitch() {
-    // Code to lower the switch with the arm only if the lid is lifted
-
-    // If the lid is not open enough to clear the arm, open it enough.
-    int lidPosition = servoLid.read();
-    if (lidPosition < openingLidAngle) {
-        servoLid.write(openingLidAngle);
-        delay(20);                          // Wait for the servo motor to finish moving
-    }
-    
-    // Vary the speed of arm movement by adding a delay
-    int movementSpeed = random(0, angleMaximumAmplitude);
-    moveServo(servoHarm, servoHarm.read(), angleMaximumAmplitude, movementSpeed);
-    digitalWrite(diodePin, LOW); // Turn off the LED
-
-    // Bring the arm back to angle 0 with a random speed
-    movementSpeed = random(0, servoHarm.read());
-    moveServo(servoHarm, servoHarm.read(), minOpeningLid, movementSpeed);
-
-    // If the lid was moved to clear the arm, put it back as at the beginning of the function.
-    if (lidPosition < openingLidAngle) {
-        servoLid.write(lidPosition);
-        delay(20);                          // Wait for the servo motor to finish moving
-    }
-}
-
 void headSpin() {
     // Code to randomly turn the head
-
-    int animationTime = random(0, 3001); // Random animation time between 0 and 3000 ms
+    int animationTime = random(0, 5001); // Random animation time between 0 and 5000 ms
     int headAngle   = 0;                 // Final head position
     int movement   = 0;                  // Determines whether the head should move left, right, or stay still
     int movementSpeed   = 0;             // Head movement speed
@@ -118,47 +93,97 @@ void headSpin() {
         headAngle = constrain(headAngle, leftHeadAngle, rightHeadAngle);
 
         if (movement != 0) {               // If the head is not still
-            animationTime -= moveServo(servoHead, servoHead.read(), headAngle, movementSpeed);
+            moveServo(servoHead, servoHead.read(), headAngle, movementSpeed);
         } else {
             delay(20);
             animationTime -= 20;
         }
     }
-
     servoHead.write(centerHeadAngle);     // Return the head to the initial position (90 degrees)
     delay(20);                            // Wait for the servo motor to finish moving  
 }
 
+void turnDownSwitch() {
+    // Code to lower the switch with the arm only if the lid is lifted
+
+    // If the lid is not open enough to clear the arm, open it enough.
+    int lidPosition = servoLid.read();
+    if (lidPosition < openingLidAngle) {
+        servoLid.write(openingLidAngle);
+        delay(20);                          // Wait for the servo motor to finish moving
+    }
+    
+    // Vary the speed of arm movement by adding a delay
+    moveServo(servoArm, servoArm.read(), angleMaximumAmplitude, random(5,50));
+    digitalWrite(diodePin, LOW);            // Turn off the LED
+    isSwoff = true;
+
+    // Bring the arm back to angle 0 with a random speed
+    moveServo(servoArm, servoArm.read(), angleMinimumAmplitude, random(5,50));
+
+    // If the lid was moved to clear the arm, put it back as at the beginning of the function.
+    if (lidPosition < openingLidAngle) {
+        servoLid.write(lidPosition);
+        delay(20);                          // Wait for the servo motor to finish moving
+    }
+}
+
+void moveArm(){
+    // Code to move the arm with the servo motor
+    for (byte x = random(26); x > 0; x--) {
+        moveServo(servoArm, servoArm.read(), random(angleMinimumAmplitude, angleMaximumAmplitude), random(5,50));
+    }
+}
+
+void haveANervousBreakdown(){
+    int numberOfClap = random(5,15);      // Number of clap that the lid will do.
+
+    for( int x = 0; x < numberOfClap; x++)
+    {
+        moveServo(servoLid, closureLid, minOpeningLid, 5); // open the lid to the minimum angle
+        moveServo(servoLid, minOpeningLid, closureLid, 5); // close the lid
+    }
+}
+
 void randomBehavior(){
 
-    int numberOfOpenings = random(1, 6);  // Between 1 and 5 openings
-    int armActivation = 0;                // 0=arm not yet activated, 1=arm already activated
+    unsigned long elapsedTime = millis() + random(2000, 30001);     // Time elapsed since program launch + animation time
 
-    // If the lid needs to be lifted more than once, decide at which opening to activate the arm
-    if (numberOfOpenings > 1)
-        armActivation = random(1, numberOfOpenings);
-    else
-        armActivation = 1;            // If not, activate the arm the first time
-  
-    for (int i = 0; i < numberOfOpenings; ++i) {
+    // As long as the animation time has not expired
+    while (millis() <= elapsedTime ) {
+        int randomAnimation = random(6);  // Random choice between 0 and 5
 
-        moveLid();                        // Lift the lid
-
-        // Spin the head and determine the opening time
-        headSpin();
-
-        // If it's the opening where the arm should be activated
-        if (i == armActivation) {
-            turnDownSwitch();
+        switch(randomAnimation){
+            case 0:
+                moveLid();                  // move the lid
+                break;
+            case 1:
+                headSpin();                  // move the head
+                break;
+            case 2:
+                moveArm();                  // move the arm
+                break;
+            case 3:
+                turnDownSwitch();           // turn down the switch
+                break;
+            case 4:
+                haveANervousBreakdown();     // The plush have a nervous breadown
+                break;
+            case 5:
+                // Delay without moving
+                delay(random(500, 3001));  // Between 0.5 and 3 seconds
         }
-
-        // Spin the head and determine the opening time
-        headSpin();
-
-        // Close the lid
-        moveLid();
-
-        // Delay before the next opening
-        delay(random(1000, 5000));
     }
+
+    // If the switch has not been turned down yet, do it
+    if(!isSwoff) 
+        turnDownSwitch();
+
+    // Pick up the arm if it's still outside
+    if(servoArm.read() > angleMinimumAmplitude)
+        moveServo(servoArm, servoArm.read(), angleMinimumAmplitude, random(angleMinimumAmplitude, servoArm.read())); // Move the arm to angle 0
+
+    //Close the lid if it is open
+    if(servoLid.read() > closureLid)
+        moveServo(servoLid, servoLid.read(), closureLid, random(closureLid, servoLid.read())); // Lift the lid to the specified angle
 }
